@@ -22,6 +22,7 @@ void stopComponents()
 {
     Timer_Stop();
     ADC_Stop();
+    BLUE_LED_Write(BLUE_LED_OFF);
 }
 
 char checkStatus(uint8_t *buffer)
@@ -31,6 +32,7 @@ char checkStatus(uint8_t *buffer)
     if(old_STATE != STATE)
     {
         onStatusChanged = 1;
+        old_STATE = STATE;
     }
     return onStatusChanged;
 }
@@ -44,11 +46,13 @@ void resetBuffer(uint8_t *buffer, int length)
     buffer[WHO_AM_I] = 0xBC;
 }
 
-void incrementAverageCounter(char *buffer)
+char incrementAverageCounter(char *buffer)
 {
     char count = buffer[CTRL_REGISTER_1_BYTE] >> 2;
 	count++;
 	buffer[CTRL_REGISTER_1_BYTE] = STATE | count;
+    
+    return count;
 }
 
 

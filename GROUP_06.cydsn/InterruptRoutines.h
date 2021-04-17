@@ -17,6 +17,8 @@
     #include "ProjectUtils.h"
     
     CY_ISR_PROTO(Custom_Timer_ISR);
+    
+    void sampleSingleChannel(char channel,int16* LDR_sample,int16* TMP_sample, char avg_count);
 
 #endif
 

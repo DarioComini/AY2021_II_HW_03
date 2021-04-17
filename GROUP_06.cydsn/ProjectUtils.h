@@ -38,6 +38,17 @@
 #define CTRL_REG_AverageSample_Bit_2 	4
 #define CTRL_REG_AverageSample_Bit_3 	5
 
+#define BLUE_LED_OFF 0
+#define BLUE_LED_ON 1
+
+#define SINGLE_CHANNEL_PERIOD 200
+#define DOUBLE_CHANNEL_PERIOD 100
+
+#define CHANNEL_TMP 0
+#define CHANNEL_LDR 1
+
+#define SAMPLES_FOR_AVG 5
+
 char STATE, old_STATE;
 
 //MACRO FOR FUNCTIONS
@@ -45,6 +56,6 @@ void startComponents(void);
 void stopComponents(void);
 char checkStatus(uint8_t *buffer);
 void resetBuffer(uint8_t *buffer, int length);
-void incrementAverageCounter(char *buffer);
+char incrementAverageCounter(char *buffer);
 
 /* [] END OF FILE */
