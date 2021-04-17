@@ -22,7 +22,7 @@ char channel, active_channels = 0;
 int main(void)
 {
     CyGlobalIntEnable; /* Enable global interrupts. */
-    //ISR_Timer_StartEx(Custom_Timer_ISR);
+    ISR_Timer_StartEx(Custom_Timer_ISR);
     EZI2C_Start();
     
     EZI2C_SetBuffer1(BUFFER_SIZE, RW_SIZE, slaveBuffer);
@@ -33,8 +33,7 @@ int main(void)
     for(;;)
     {
         if(checkStatus(slaveBuffer))
-        {
-            startComponents();   
+        {   
             switch(STATE)
             {
                 case DEVICE_STOPPED: //completed
@@ -61,6 +60,8 @@ int main(void)
                     break;
                 
             }
+            Timer_WritePeriod(slaveBuffer[CTRL_REGISTER_2_BYTE]); //controllare dopo risposta alla domanda
+            startComponents();
         }
         
     }
