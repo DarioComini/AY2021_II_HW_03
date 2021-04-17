@@ -10,10 +10,18 @@
  * ========================================
 */
 #include "project.h"
+#include "ProjectUtils.h"
+#include <stdio.h>
+
+uint8_t slaveBuffer[BUFFER_SIZE] = {0,0,0xBC,0,0,0,0};
 
 int main(void)
 {
     CyGlobalIntEnable; /* Enable global interrupts. */
+    //ISR_Timer_StartEx(Custom_Timer_ISR);
+    startComponents();
+    
+    EZI2C_SetBuffer1(BUFFER_SIZE, RW_SIZE, slaveBuffer);
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
 
