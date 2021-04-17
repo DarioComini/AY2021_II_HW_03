@@ -44,5 +44,7 @@ char STATE, old_STATE;
 void startComponents(void);
 void stopComponents(void);
 char checkStatus(uint8_t *buffer);
+void resetBuffer(uint8_t *buffer, int length);
+void incrementAverageCounter(char *buffer);
 
 /* [] END OF FILE */

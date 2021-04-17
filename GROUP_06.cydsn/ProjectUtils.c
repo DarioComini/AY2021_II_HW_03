@@ -35,5 +35,21 @@ char checkStatus(uint8_t *buffer)
     return onStatusChanged;
 }
 
+void resetBuffer(uint8_t *buffer, int length)
+{
+    for(int i = 0; i<length; i++)
+    {
+        buffer[i] = 0;
+    }
+    buffer[WHO_AM_I] = 0xBC;
+}
+
+void incrementAverageCounter(char *buffer)
+{
+    char count = buffer[CTRL_REGISTER_1_BYTE] >> 2;
+	count++;
+	buffer[CTRL_REGISTER_1_BYTE] = STATE | count;
+}
+
 
 /* [] END OF FILE */
