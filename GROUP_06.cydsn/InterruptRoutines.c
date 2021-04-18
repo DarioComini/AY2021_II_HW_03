@@ -10,6 +10,7 @@
  * ========================================
 */
 #include "InterruptRoutines.h" 
+#include "math.h"
 
 extern char slaveBuffer[BUFFER_SIZE];
 extern char channel, active_channels;
@@ -47,22 +48,28 @@ void sampleSingleChannel(char channel,int16 *LDR_sample,int16 *TMP_sample, char 
             break;
     }
     
-    //convert in mV and sum in a variable
-    
-    //if average register is = n°canali * 5 salva_average()
     if (avg_count == SAMPLES_FOR_AVG*active_channels)
     {
-        //fai media
+        //perform average
         *TMP_sample = *TMP_sample/SAMPLES_FOR_AVG;
         *LDR_sample = *LDR_sample/SAMPLES_FOR_AVG;
         
-        //salva nell'I2C
-        slaveBuffer[TMP_Bit_15_8] = *TMP_sample>>8;
-        slaveBuffer[TMP_Bit_07_0] = *TMP_sample & 0x0F;
-        slaveBuffer[LDR_Bit_15_8] = *LDR_sample>>8;
-        slaveBuffer[LDR_Bit_07_0] = *LDR_sample & 0x0F;
+        //convert in temperature
+        float temp = ((float)*TMP_sample - 500.0)/10.0;
+        *TMP_sample = (int16)temp;
         
-        //reset average, counter e variabili dei sensori
+        //convert in lux
+        //double exponent = (log10(5*990/(*LDR_sample)-990)-10.6617)/(-0.67609152744);
+        //double result = pow(10,exponent);
+        //*LDR_sample = (int16) result;
+        
+        //save into I2C
+        slaveBuffer[TMP_Bit_15_8] = *TMP_sample>>8;
+        slaveBuffer[TMP_Bit_07_0] = *TMP_sample & 0xFF;
+        slaveBuffer[LDR_Bit_15_8] = *LDR_sample>>8;
+        slaveBuffer[LDR_Bit_07_0] = *LDR_sample & 0xFF;
+        
+        //reset average, counter and sensor variables
         *TMP_sample = 0;
         *LDR_sample = 0;
         slaveBuffer[CTRL_REGISTER_1_BYTE] &= 0b11;
