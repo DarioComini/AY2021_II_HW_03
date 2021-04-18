@@ -50,7 +50,7 @@ char incrementAverageCounter(char *buffer)
 {
     char count = buffer[CTRL_REGISTER_1_BYTE] >> 2;
 	count++;
-	buffer[CTRL_REGISTER_1_BYTE] = STATE | count;
+	buffer[CTRL_REGISTER_1_BYTE] = STATE | (count<<2);
     
     return count;
 }
