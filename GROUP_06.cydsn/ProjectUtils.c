@@ -11,6 +11,12 @@
 */
 #include "ProjectUtils.h" 
 
+static void resetVariables()
+{
+    TMP_sample = 0;
+    LDR_sample = 0;
+}
+
 void startComponents()
 {
     Timer_Start();
@@ -33,6 +39,7 @@ char checkStatus(uint8_t *buffer)
     {
         onStatusChanged = 1;
         old_STATE = STATE;
+        resetVariables();
     }
     return onStatusChanged;
 }

@@ -50,6 +50,7 @@
 #define SAMPLES_FOR_AVG 5
 
 char STATE, old_STATE;
+extern int16 LDR_sample, TMP_sample;
 
 //MACRO FOR FUNCTIONS
 void startComponents(void);

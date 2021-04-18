@@ -13,8 +13,7 @@
 
 extern char slaveBuffer[BUFFER_SIZE];
 extern char channel, active_channels;
-
-int16 LDR_sample = 0, TMP_sample = 0;
+extern int16 LDR_sample, TMP_sample;
 
 CY_ISR(Custom_Timer_ISR)
 {
@@ -27,6 +26,7 @@ CY_ISR(Custom_Timer_ISR)
     if (STATE == BOTH_SAMPLING)
     {
         channel = !channel;
+        MUX_Select(channel);
     }
     
     //read one ADC sample
