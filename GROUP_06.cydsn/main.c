@@ -16,7 +16,11 @@
 #include "math.h"
 
 char sample_ready = 0;
+char ISR_tracker = 0;
 int32 value_digit = 0;
+
+uint8_t slaveBuffer[BUFFER_SIZE] = {0,0,WHO_AM_I_REG_VALUE,0,0,0,0};
+char channel = CHANNEL_TMP, active_channels = 0;
 
 
 int16 LDR_sample = 0, TMP_sample = 0;
@@ -24,9 +28,6 @@ int16 LDR_sample = 0, TMP_sample = 0;
 
 int main(void)
 {
-    uint8_t slaveBuffer[BUFFER_SIZE] = {0,0,WHO_AM_I_REG_VALUE,0,0,0,0};
-    char channel = CHANNEL_TMP, active_channels = 0;
-    
     CyGlobalIntEnable; /* Enable global interrupts. */
     
     //enable timer interrupt
@@ -40,32 +41,6 @@ int main(void)
     
     for(;;)
     {
-        //if status changed
-        if(checkStatus(slaveBuffer))
-        {   
-            switch(STATE)
-            {
-                case DEVICE_STOPPED: //completed
-                    stopComponents();
-                    resetBuffer(slaveBuffer,BUFFER_SIZE);
-                    break;
-                case TMP_SAMPLING:
-                    active_channels = 1;
-                    init_state(slaveBuffer,SINGLE_CHANNEL_PERIOD, channel = CHANNEL_TMP);
-                    break;
-                case LDR_SAMPLING:
-                    active_channels = 1;
-                    init_state(slaveBuffer,SINGLE_CHANNEL_PERIOD,channel = CHANNEL_LDR);
-                    break;
-                case BOTH_SAMPLING:
-                    init_state(slaveBuffer,DOUBLE_CHANNEL_PERIOD,channel = CHANNEL_TMP);
-                    BLUE_LED_Write(BLUE_LED_ON);
-                    active_channels = 2;
-                    break;
-                
-            }
-        }
-        
         //if data is ready
         if (sample_ready)
         {            
@@ -79,14 +54,14 @@ int main(void)
                     LDR_sample+=ADC_CountsTo_mVolts(value_digit);
                     break;
             }
-            if (incrementAverageCounter(slaveBuffer) == SAMPLES_FOR_AVG*active_channels)
+            if (ISR_tracker == samplesForAverage*active_channels)
             {
                 //perform average
-                TMP_sample = TMP_sample/SAMPLES_FOR_AVG;
-                LDR_sample = LDR_sample/SAMPLES_FOR_AVG;
+                TMP_sample = TMP_sample/samplesForAverage;
+                LDR_sample = LDR_sample/samplesForAverage;
                 
                 //convert in temperature
-                TMP_sample = (TMP_sample - 500.0)/10.0;
+                TMP_sample = ((TMP_sample - 500.0)/10.0)*100;   //we multiply by 100 to have more resolution
                 
                 //convert in lux
                 double LDR = SERIES_RESISTANCE * (ACTUAL_Vdd_mV / LDR_sample - 1.0);
@@ -101,6 +76,7 @@ int main(void)
                 //reset average, counter and sensor variables
                 TMP_sample = 0;
                 LDR_sample = 0;
+                ISR_tracker = 0;
                 slaveBuffer[CTRL_REGISTER_1_BYTE] &= 0b11;
             }
             if (STATE == BOTH_SAMPLING)
