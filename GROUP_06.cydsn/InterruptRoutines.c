@@ -14,7 +14,7 @@
 extern char sample_ready;
 
 extern int16 LDR_sample, TMP_sample;
-int32 value_digit;
+extern int32 value_digit;
 
 CY_ISR(Custom_Timer_ISR)
 {

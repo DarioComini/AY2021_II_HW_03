@@ -25,7 +25,7 @@ int16 LDR_sample = 0, TMP_sample = 0;
 int main(void)
 {
     uint8_t slaveBuffer[BUFFER_SIZE] = {0,0,WHO_AM_I_REG_VALUE,0,0,0,0};
-    char channel, active_channels = 0;
+    char channel = CHANNEL_TMP, active_channels = 0;
     
     CyGlobalIntEnable; /* Enable global interrupts. */
     
@@ -35,7 +35,9 @@ int main(void)
     //initialize I2C slave component
     EZI2C_Start();
     EZI2C_SetBuffer1(BUFFER_SIZE, RW_SIZE, slaveBuffer);
-
+    
+    slaveBuffer[CTRL_REGISTER_1_BYTE]=0b10;
+    
     for(;;)
     {
         //if status changed
@@ -88,8 +90,9 @@ int main(void)
                 TMP_sample = (int16)temp;
                 
                 //convert in lux
-                double LDR = SERIES_RESISTANCE * (ACTUAL_Vdd_mV / TMP_sample - 1.0);
-                TMP_sample = (int16) (pow(LDR/TEN_TO_LDR_INTERCEPT, 1/LDR_SLOPE));
+                double LDR = SERIES_RESISTANCE * (ACTUAL_Vdd_mV / LDR_sample - 1.0);
+                float one_over_m = 1/LDR_SLOPE;
+                LDR_sample = (int16) (pow(LDR/TEN_TO_LDR_INTERCEPT, one_over_m));
                 
                 //save into I2C
                 slaveBuffer[TMP_Bit_15_8] = TMP_sample>>8;

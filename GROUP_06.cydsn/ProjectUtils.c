@@ -21,7 +21,7 @@ void startComponents()
 {
     Timer_Start();
     ADC_Start();
-    ADC_SetGain((65535/ACTUAL_Vdd_mV)*1000 + 1);
+    ADC_SetGain(14094);//((65535/ACTUAL_Vdd_mV)*1000 + 1);
     EZI2C_Start();
 }
 
