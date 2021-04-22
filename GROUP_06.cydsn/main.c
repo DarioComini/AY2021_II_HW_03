@@ -14,7 +14,7 @@
 #include "InterruptRoutines.h"
 #include <stdio.h>
 
-uint8_t slaveBuffer[BUFFER_SIZE] = {0,0,0xBC,0,0,0,0};
+uint8_t slaveBuffer[BUFFER_SIZE] = {0,0,WHO_AM_I_REG_VALUE,0,0,0,0};
 
 char channel, active_channels = 0;
 int16 LDR_sample = 0, TMP_sample = 0;
@@ -47,6 +47,7 @@ int main(void)
                     channel = CHANNEL_TMP;
                     active_channels = 1;
                     MUX_Select(channel);
+                    BLUE_LED_Write(BLUE_LED_OFF);
                     break;
                 case LDR_SAMPLING:
                     //timer in modo che overflow period 200
@@ -54,6 +55,7 @@ int main(void)
                     channel = CHANNEL_LDR;
                     active_channels = 1;
                     MUX_Select(channel);
+                    BLUE_LED_Write(BLUE_LED_OFF);
                     break;
                 case BOTH_SAMPLING:
                     //timer in modo che overflow period 100

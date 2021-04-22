@@ -15,6 +15,7 @@
 extern char slaveBuffer[BUFFER_SIZE];
 extern char channel, active_channels;
 extern int16 LDR_sample, TMP_sample;
+int32 value_digit;
 
 CY_ISR(Custom_Timer_ISR)
 {
@@ -38,13 +39,17 @@ CY_ISR(Custom_Timer_ISR)
 
 void sampleSingleChannel(char channel,int16 *LDR_sample,int16 *TMP_sample, char avg_count)
 {
+    value_digit = ADC_Read32();
+    if(value_digit<0)       value_digit=0;
+    if(value_digit>65535)   value_digit=65535;
+    
     switch (channel)
     {
         case CHANNEL_TMP:
-            *TMP_sample+=ADC_CountsTo_mVolts(ADC_Read32());
+            *TMP_sample+=ADC_CountsTo_mVolts(value_digit);
             break;
         case CHANNEL_LDR:
-            *LDR_sample+=ADC_CountsTo_mVolts(ADC_Read32());
+            *LDR_sample+=ADC_CountsTo_mVolts(value_digit);
             break;
     }
     

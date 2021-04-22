@@ -38,6 +38,8 @@
 #define CTRL_REG_AverageSample_Bit_2 	4
 #define CTRL_REG_AverageSample_Bit_3 	5
 
+#define WHO_AM_I_REG_VALUE      0xBC
+
 #define BLUE_LED_OFF 0
 #define BLUE_LED_ON 1
 

@@ -50,7 +50,7 @@ void resetBuffer(uint8_t *buffer, int length)
     {
         buffer[i] = 0;
     }
-    buffer[WHO_AM_I] = 0xBC;
+    buffer[WHO_AM_I] = WHO_AM_I_REG_VALUE;
 }
 
 char incrementAverageCounter(char *buffer)
