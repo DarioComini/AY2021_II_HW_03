@@ -86,13 +86,11 @@ int main(void)
                 LDR_sample = LDR_sample/SAMPLES_FOR_AVG;
                 
                 //convert in temperature
-                float temp = ((float) TMP_sample - 500.0)/10.0;
-                TMP_sample = (int16)temp;
+                TMP_sample = (TMP_sample - 500.0)/10.0;
                 
                 //convert in lux
                 double LDR = SERIES_RESISTANCE * (ACTUAL_Vdd_mV / LDR_sample - 1.0);
-                float one_over_m = 1/LDR_SLOPE;
-                LDR_sample = (int16) (pow(LDR/TEN_TO_LDR_INTERCEPT, one_over_m));
+                LDR_sample = (int16) (pow(LDR/TEN_TO_LDR_INTERCEPT, 1/LDR_SLOPE));
                 
                 //save into I2C
                 slaveBuffer[TMP_Bit_15_8] = TMP_sample>>8;
