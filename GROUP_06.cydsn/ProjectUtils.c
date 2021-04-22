@@ -54,7 +54,7 @@ void resetBuffer(uint8_t *buffer, int length)
     buffer[WHO_AM_I] = WHO_AM_I_REG_VALUE;
 }
 
-char incrementAverageCounter(char *buffer)
+char incrementAverageCounter(uint8_t *buffer)
 {
     char count = buffer[CTRL_REGISTER_1_BYTE] >> 2;
 	count++;

@@ -64,6 +64,6 @@ void startComponents(void);
 void stopComponents(void);
 char checkStatus(uint8_t *buffer);
 void resetBuffer(uint8_t *buffer, int length);
-char incrementAverageCounter(char *buffer);
+char incrementAverageCounter(uint8_t *buffer);
 
 /* [] END OF FILE */

@@ -13,26 +13,32 @@
 #include "ProjectUtils.h"
 #include "InterruptRoutines.h"
 #include <stdio.h>
+#include "math.h"
 
-uint8_t slaveBuffer[BUFFER_SIZE] = {0,0,WHO_AM_I_REG_VALUE,0,0,0,0};
+char sample_ready = 0;
+int32 value_digit = 0;
 
-char channel, active_channels = 0;
+
 int16 LDR_sample = 0, TMP_sample = 0;
 
 
 int main(void)
 {
-    CyGlobalIntEnable; /* Enable global interrupts. */
-    ISR_Timer_StartEx(Custom_Timer_ISR);
-    EZI2C_Start();
+    uint8_t slaveBuffer[BUFFER_SIZE] = {0,0,WHO_AM_I_REG_VALUE,0,0,0,0};
+    char channel, active_channels = 0;
     
+    CyGlobalIntEnable; /* Enable global interrupts. */
+    
+    //enable timer interrupt
+    ISR_Timer_StartEx(Custom_Timer_ISR);
+    
+    //initialize I2C slave component
+    EZI2C_Start();
     EZI2C_SetBuffer1(BUFFER_SIZE, RW_SIZE, slaveBuffer);
-    old_STATE = DEVICE_STOPPED;
-
-    /* Place your initialization/startup code here (e.g. MyInst_Start()) */
 
     for(;;)
     {
+        //if status changed
         if(checkStatus(slaveBuffer))
         {   
             switch(STATE)
@@ -62,7 +68,7 @@ int main(void)
                     BLUE_LED_Write(BLUE_LED_ON);
                     slaveBuffer[CTRL_REGISTER_2_BYTE] = DOUBLE_CHANNEL_PERIOD;
                     active_channels = 2;
-                    channel = CHANNEL_LDR;
+                    channel = CHANNEL_TMP;
                     MUX_Select(channel);
                     break;
                 
@@ -74,7 +80,52 @@ int main(void)
             }
         }
         
-    }
+        //if data is ready
+        if (sample_ready)
+        {            
+            //add sampled data to sensor variables
+            switch (channel)
+            {
+                case CHANNEL_TMP:
+                    TMP_sample+=ADC_CountsTo_mVolts(value_digit);
+                    break;
+                case CHANNEL_LDR:
+                    LDR_sample+=ADC_CountsTo_mVolts(value_digit);
+                    break;
+            }
+            if (incrementAverageCounter(slaveBuffer) == SAMPLES_FOR_AVG*active_channels)
+            {
+                //perform average
+                TMP_sample = TMP_sample/SAMPLES_FOR_AVG;
+                LDR_sample = LDR_sample/SAMPLES_FOR_AVG;
+                
+                //convert in temperature
+                float temp = ((float) TMP_sample - 500.0)/10.0;
+                TMP_sample = (int16)temp;
+                
+                //convert in lux
+                double LDR = SERIES_RESISTANCE * (ACTUAL_Vdd_mV / TMP_sample - 1.0);
+                TMP_sample = (int16) (pow(LDR/TEN_TO_LDR_INTERCEPT, 1/LDR_SLOPE));
+                
+                //save into I2C
+                slaveBuffer[TMP_Bit_15_8] = TMP_sample>>8;
+                slaveBuffer[TMP_Bit_07_0] = TMP_sample & 0xFF;
+                slaveBuffer[LDR_Bit_15_8] = LDR_sample>>8;
+                slaveBuffer[LDR_Bit_07_0] = LDR_sample & 0xFF;
+                
+                //reset average, counter and sensor variables
+                TMP_sample = 0;
+                LDR_sample = 0;
+                slaveBuffer[CTRL_REGISTER_1_BYTE] &= 0b11;
+            }
+            if (STATE == BOTH_SAMPLING)
+            {
+                channel = !channel;
+                MUX_Select(channel);
+            }
+            sample_ready = 0;
+        }
+    }   
 }
 
 /* [] END OF FILE */
