@@ -48,35 +48,19 @@ int main(void)
                     resetBuffer(slaveBuffer,BUFFER_SIZE);
                     break;
                 case TMP_SAMPLING:
-                    //timer in modo che overflow period 200
-                    slaveBuffer[CTRL_REGISTER_2_BYTE] = SINGLE_CHANNEL_PERIOD;
-                    channel = CHANNEL_TMP;
                     active_channels = 1;
-                    MUX_Select(channel);
-                    BLUE_LED_Write(BLUE_LED_OFF);
+                    init_state(slaveBuffer,SINGLE_CHANNEL_PERIOD, channel = CHANNEL_TMP);
                     break;
                 case LDR_SAMPLING:
-                    //timer in modo che overflow period 200
-                    slaveBuffer[CTRL_REGISTER_2_BYTE] = SINGLE_CHANNEL_PERIOD;
-                    channel = CHANNEL_LDR;
                     active_channels = 1;
-                    MUX_Select(channel);
-                    BLUE_LED_Write(BLUE_LED_OFF);
+                    init_state(slaveBuffer,SINGLE_CHANNEL_PERIOD,channel = CHANNEL_LDR);
                     break;
                 case BOTH_SAMPLING:
-                    //timer in modo che overflow period 100
+                    init_state(slaveBuffer,DOUBLE_CHANNEL_PERIOD,channel = CHANNEL_TMP);
                     BLUE_LED_Write(BLUE_LED_ON);
-                    slaveBuffer[CTRL_REGISTER_2_BYTE] = DOUBLE_CHANNEL_PERIOD;
                     active_channels = 2;
-                    channel = CHANNEL_TMP;
-                    MUX_Select(channel);
                     break;
                 
-            }
-            if(STATE != DEVICE_STOPPED)
-            {
-                Timer_WritePeriod(slaveBuffer[CTRL_REGISTER_2_BYTE]); //controllare dopo risposta alla domanda
-                startComponents();
             }
         }
         
@@ -125,7 +109,7 @@ int main(void)
             }
             sample_ready = 0;
         }
-    }   
+    }
 }
 
 /* [] END OF FILE */

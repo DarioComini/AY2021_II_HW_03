@@ -64,4 +64,15 @@ char incrementAverageCounter(uint8_t *buffer)
 }
 
 
+void init_state(uint8_t *buffer, char timer_period, char channel)
+{
+    BLUE_LED_Write(BLUE_LED_OFF);
+    buffer[CTRL_REGISTER_2_BYTE] = timer_period;
+    Timer_WritePeriod(buffer[CTRL_REGISTER_2_BYTE]); //controllare dopo risposta alla domanda
+
+    MUX_Select(channel);
+    
+    startComponents();
+}
+
 /* [] END OF FILE */
