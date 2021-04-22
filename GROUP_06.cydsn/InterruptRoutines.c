@@ -19,6 +19,7 @@ extern int32 value_digit;
 CY_ISR(Custom_Timer_ISR)
 {
     Timer_ReadStatusRegister();
+    ISR_tracker++;
     
     //read one ADC sample
     value_digit = ADC_Read32();

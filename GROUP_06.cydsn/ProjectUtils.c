@@ -15,6 +15,7 @@ static void resetVariables()
 {
     TMP_sample = 0;
     LDR_sample = 0;
+    ISR_tracker = 0;
 }
 
 void startComponents()
@@ -54,11 +55,11 @@ void resetBuffer(uint8_t *buffer, int length)
     buffer[WHO_AM_I] = WHO_AM_I_REG_VALUE;
 }
 
-void init_state(uint8_t *buffer, char timer_period, char channel)
+void init_state(uint8_t *buffer, char channel)
 {
     BLUE_LED_Write(BLUE_LED_OFF);
-    buffer[CTRL_REGISTER_2_BYTE] = timer_period;
-    Timer_WritePeriod(buffer[CTRL_REGISTER_2_BYTE]); //controllare dopo risposta alla domanda
+    if(buffer[CTRL_REGISTER_2_BYTE] > 0)                Timer_WritePeriod(buffer[CTRL_REGISTER_2_BYTE]); 
+    else                                                Timer_WritePeriod(DEFAULT_CHANNEL_PERIOD);
     
     if((buffer[CTRL_REGISTER_1_BYTE]>>2 & 0xFF) > 0)    samplesForAverage = (buffer[CTRL_REGISTER_1_BYTE]>>2 & 0xFF);
     else                                                samplesForAverage = DEFAULT_SAMPLES_FOR_AVG;

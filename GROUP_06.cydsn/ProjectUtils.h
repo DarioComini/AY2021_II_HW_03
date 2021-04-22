@@ -43,8 +43,7 @@
 #define BLUE_LED_OFF 0
 #define BLUE_LED_ON 1
 
-#define SINGLE_CHANNEL_PERIOD 200
-#define DOUBLE_CHANNEL_PERIOD 100
+#define DEFAULT_CHANNEL_PERIOD 200
 
 #define CHANNEL_TMP 0
 #define CHANNEL_LDR 1
@@ -57,6 +56,7 @@
 #define LDR_SLOPE                   -0.682
 
 char STATE, samplesForAverage;
+extern char ISR_tracker;
 extern int16 LDR_sample, TMP_sample;
 
 //MACRO FOR FUNCTIONS
@@ -64,6 +64,6 @@ void startComponents(void);
 void stopComponents(void);
 char checkStatus(uint8_t *buffer);
 void resetBuffer(uint8_t *buffer, int length);
-void init_state(uint8_t *buffer, char timer_period, char channel);
+void init_state(uint8_t *buffer, char channel);
 
 /* [] END OF FILE */

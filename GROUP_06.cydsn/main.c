@@ -52,14 +52,14 @@ int main(void)
                     break;
                 case TMP_SAMPLING:
                     active_channels = 1;
-                    init_state(slaveBuffer,SINGLE_CHANNEL_PERIOD, channel = CHANNEL_TMP);
+                    init_state(slaveBuffer, channel = CHANNEL_TMP);
                     break;
                 case LDR_SAMPLING:
                     active_channels = 1;
-                    init_state(slaveBuffer,SINGLE_CHANNEL_PERIOD,channel = CHANNEL_LDR);
+                    init_state(slaveBuffer, channel = CHANNEL_LDR);
                     break;
                 case BOTH_SAMPLING:
-                    init_state(slaveBuffer,DOUBLE_CHANNEL_PERIOD,channel = CHANNEL_TMP);
+                    init_state(slaveBuffer, channel = CHANNEL_TMP);
                     BLUE_LED_Write(BLUE_LED_ON);
                     active_channels = 2;
                     break;
@@ -102,6 +102,7 @@ int main(void)
                 //reset average, counter and sensor variables
                 TMP_sample = 0;
                 LDR_sample = 0;
+                ISR_tracker = 0;
                 slaveBuffer[CTRL_REGISTER_1_BYTE] &= 0b11;
             }
             if (STATE == BOTH_SAMPLING)
