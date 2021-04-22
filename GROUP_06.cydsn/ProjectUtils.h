@@ -56,7 +56,7 @@
 #define TEN_TO_LDR_INTERCEPT        100000 //q = 5 -> pow(10,q) = 100000
 #define LDR_SLOPE                   -0.682
 
-char STATE, old_STATE;
+char STATE;
 extern int16 LDR_sample, TMP_sample;
 
 //MACRO FOR FUNCTIONS

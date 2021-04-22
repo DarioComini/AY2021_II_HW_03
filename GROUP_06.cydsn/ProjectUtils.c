@@ -21,6 +21,7 @@ void startComponents()
 {
     Timer_Start();
     ADC_Start();
+    ADC_SetGain((65535/ACTUAL_Vdd_mV)*1000 + 1);
     EZI2C_Start();
 }
 
@@ -34,11 +35,11 @@ void stopComponents()
 char checkStatus(uint8_t *buffer)
 {
     char onStatusChanged = 0;
-    STATE = (buffer[CTRL_REGISTER_1_BYTE] & MASK_BIT_0) + (buffer[CTRL_REGISTER_1_BYTE] & MASK_BIT_1);
-    if(old_STATE != STATE)
+    char new_state = (buffer[CTRL_REGISTER_1_BYTE] & MASK_BIT_0) + (buffer[CTRL_REGISTER_1_BYTE] & MASK_BIT_1);
+    if(new_state != STATE)
     {
         onStatusChanged = 1;
-        old_STATE = STATE;
+        STATE = new_state;
         resetVariables();
     }
     return onStatusChanged;
