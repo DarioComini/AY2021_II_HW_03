@@ -1,0 +1,33 @@
+; Enter DEVICE_STOPPED state (Write status to be 0b00)
+w 08 00 00 p
+
+; Check WHO_AM_I register (Write register WHO_AM_I address and read the content)
+w 08 02 p r 08 x p
+
+; Sample TEMPERATURE[hundredths of Celsius]
+
+w 08 01 C8 p    ;run this to set the timer period to 200   
+w 08 00 15 p    ;run this to set the status to 0b01 and to set the number of samples for average to 5
+;NOTE: the number of samples for average and the value of timer period are set to fullfill the 50 Hz transmission. 
+;Any different value will compromise this transmission rate
+ 
+w 08 03 p r 08 @1temp_centiCelsius @0temp_centiCelsius p  ; repeat this line to plot data (in hundredths of Celsius)
+
+; Sample LIGHT[LUX] 
+
+w 08 01 02 p    ;run this to set the timer period to 200   
+w 08 00 16 p    ;run this to set the status to 0b10 and to set the number of samples for average to 5
+;NOTE: the number of samples for average and the value of timer period are set to fullfill the 50 Hz transmission. 
+;Any different value will compromise this transmission rate
+ 
+w 08 05 p r 08 @1light_LUX @0light_LUX p  ; repeat this line to plot data (in LUX)
+
+
+; Sample TEMPERATURE[hundredths of Celsius] & LIGHT[LUX] (BOTH_CHANNELS)
+
+w 08 01 64 p    ;run this to set the timer period to 100   
+w 08 00 17 p    ;run this to set the status to 0b11 and to set the number of samples for average to 5 for each channel 
+;NOTE: the number of samples for average and the value of timer period are set to fullfill the 50 Hz transmission. 
+;Any different value will compromise this transmission rate
+ 
+w 08 03 p r 08 @1temp_centiCelsius @0temp_centiCelsius @1light_LUX @0light_LUX p  ; repeat this line to plot data from both channels
