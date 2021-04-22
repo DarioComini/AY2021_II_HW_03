@@ -59,7 +59,7 @@ void init_state(uint8_t *buffer, char channel)
 {
     BLUE_LED_Write(BLUE_LED_OFF);
     if(buffer[CTRL_REGISTER_2_BYTE] > 0)                Timer_WritePeriod(buffer[CTRL_REGISTER_2_BYTE]); 
-    else                                                Timer_WritePeriod(DEFAULT_CHANNEL_PERIOD);
+    else                                                Timer_WritePeriod(DEFAULT_TIMER_PERIOD);
     
     if((buffer[CTRL_REGISTER_1_BYTE]>>2 & 0xFF) > 0)    samplesForAverage = (buffer[CTRL_REGISTER_1_BYTE]>>2 & 0xFF);
     else                                                samplesForAverage = DEFAULT_SAMPLES_FOR_AVG;
