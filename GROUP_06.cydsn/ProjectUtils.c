@@ -21,7 +21,7 @@ void startComponents()
 {
     Timer_Start();
     ADC_Start();
-    ADC_SetGain((65535/ACTUAL_Vdd_mV)*1000 + 1);
+    ADC_SetGain(14094);//((65535/ACTUAL_Vdd_mV)*1000 + 1);
     EZI2C_Start();
 }
 
@@ -63,5 +63,16 @@ char incrementAverageCounter(uint8_t *buffer)
     return count;
 }
 
+
+void init_state(uint8_t *buffer, char timer_period, char channel)
+{
+    BLUE_LED_Write(BLUE_LED_OFF);
+    buffer[CTRL_REGISTER_2_BYTE] = timer_period;
+    Timer_WritePeriod(buffer[CTRL_REGISTER_2_BYTE]); //controllare dopo risposta alla domanda
+
+    MUX_Select(channel);
+    
+    startComponents();
+}
 
 /* [] END OF FILE */
