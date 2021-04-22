@@ -49,6 +49,11 @@
 
 #define SAMPLES_FOR_AVG 5
 
+#define SERIES_RESISTANCE           990
+#define ACTUAL_Vdd_mV               4650.0
+#define TEN_TO_LDR_INTERCEPT        100000 //q = 5 -> pow(10,q) = 100000
+#define LDR_SLOPE                   -0.682
+
 char STATE, old_STATE;
 extern int16 LDR_sample, TMP_sample;
 

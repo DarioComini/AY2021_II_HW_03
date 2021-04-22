@@ -59,9 +59,8 @@ void sampleSingleChannel(char channel,int16 *LDR_sample,int16 *TMP_sample, char 
         *TMP_sample = (int16)temp;
         
         //convert in lux
-        //double exponent = (log10(5*990/(*LDR_sample)-990)-10.6617)/(-0.67609152744);
-        //double result = pow(10,exponent);
-        //*LDR_sample = (int16) result;
+        double LDR = SERIES_RESISTANCE * (ACTUAL_Vdd_mV / *TMP_sample - 1.0);
+        *TMP_sample = (int16) (pow(LDR/TEN_TO_LDR_INTERCEPT, 1/LDR_SLOPE));
         
         //save into I2C
         slaveBuffer[TMP_Bit_15_8] = *TMP_sample>>8;
