@@ -11,7 +11,7 @@
 */
 #include "InterruptRoutines.h" 
 
-extern char sample_ready;
+extern char sample_ready, ISR_tracker;
 
 extern int16 LDR_sample, TMP_sample;
 extern int32 value_digit;

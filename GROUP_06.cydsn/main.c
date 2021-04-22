@@ -16,6 +16,7 @@
 #include "math.h"
 
 char sample_ready = 0;
+char ISR_tracker = 0;
 int32 value_digit = 0;
 
 
@@ -79,11 +80,11 @@ int main(void)
                     LDR_sample+=ADC_CountsTo_mVolts(value_digit);
                     break;
             }
-            if (incrementAverageCounter(slaveBuffer) == SAMPLES_FOR_AVG*active_channels)
+            if (ISR_tracker == samplesForAverage*active_channels)
             {
                 //perform average
-                TMP_sample = TMP_sample/SAMPLES_FOR_AVG;
-                LDR_sample = LDR_sample/SAMPLES_FOR_AVG;
+                TMP_sample = TMP_sample/samplesForAverage;
+                LDR_sample = LDR_sample/samplesForAverage;
                 
                 //convert in temperature
                 TMP_sample = (TMP_sample - 500.0)/10.0;
