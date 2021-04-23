@@ -19,6 +19,8 @@ extern int32 value_digit;
 extern uint8_t slaveBuffer[BUFFER_SIZE];
 extern char channel, active_channels;
 
+extern uint8 transmission_ready;
+
 CY_ISR(Custom_Timer_ISR)
 {
     Timer_ReadStatusRegister();
@@ -36,31 +38,58 @@ CY_ISR(Custom_Timer_ISR)
 
 void EZI2C_ISR_ExitCallback()
 {
+    
     //if status changed
-        if(checkStatus(slaveBuffer))
-        {   
-            switch(STATE)
+    if(checkStatus(slaveBuffer))
+    {   
+        switch(STATE)
+        {
+            case DEVICE_STOPPED: //completed
+                stopComponents();
+                resetBuffer(slaveBuffer,BUFFER_SIZE);
+                break;
+            case TMP_SAMPLING:
+                active_channels = 1;
+                init_state(slaveBuffer, channel = CHANNEL_TMP);
+                break;
+            case LDR_SAMPLING:
+                active_channels = 1;
+                init_state(slaveBuffer, channel = CHANNEL_LDR);
+                break;
+            case BOTH_SAMPLING:
+                init_state(slaveBuffer, channel = CHANNEL_TMP);
+                BLUE_LED_Write(BLUE_LED_ON);
+                active_channels = 2;
+                break;
+            
+        }
+    }
+    
+    //check if average is changed
+    if((slaveBuffer[CTRL_REGISTER_1_BYTE]>>2 & 0x0F) > 0)    
+        samplesForAverage = (slaveBuffer[CTRL_REGISTER_1_BYTE]>>2 & 0x0F);
+    else
+        samplesForAverage = 1;
+    
+    
+    
+    char EZ_status = EZI2C_GetActivity();
+
+    if (STATE>DEVICE_STOPPED)
+    {
+        if (EZ_status & EZI2C_STATUS_WRITE1) //write1 was sent
+        {
+            if (!transmission_ready)
             {
-                case DEVICE_STOPPED: //completed
-                    stopComponents();
-                    resetBuffer(slaveBuffer,BUFFER_SIZE);
-                    break;
-                case TMP_SAMPLING:
-                    active_channels = 1;
-                    init_state(slaveBuffer, channel = CHANNEL_TMP);
-                    break;
-                case LDR_SAMPLING:
-                    active_channels = 1;
-                    init_state(slaveBuffer, channel = CHANNEL_LDR);
-                    break;
-                case BOTH_SAMPLING:
-                    init_state(slaveBuffer, channel = CHANNEL_TMP);
-                    BLUE_LED_Write(BLUE_LED_ON);
-                    active_channels = 2;
-                    break;
-                
+                EZI2C_DisableInt();
             }
         }
+        else
+        {
+            transmission_ready = 0;
+        }
+    }
+    
 }
 
 
