@@ -11,13 +11,6 @@
 
 
 
-
-//#include "stdio.h"
-
-
-
-
-
 /*******************************************************************************
 * Function Name: Custom_Timer_ISR
 ********************************************************************************
@@ -68,23 +61,26 @@ void EZI2C_ISR_ExitCallback()
         {
             // state 0 (device stopped)
             case DEVICE_STOPPED:
+                #if BCP_TRANSMISSION_DEBUG
+                    EZI2C_EnableInt();
+                #endif 
                 stopComponents();
                 resetBuffer(slaveBuffer);
                 break;
                 
             //initialization to sample temperature sensor
             case TMP_SAMPLING:
-                init_state(slaveBuffer, channel = CHANNEL_TMP,active_channels = 1);
+                init_state(channel = CHANNEL_TMP,active_channels = 1);
                 break;
             
             //initialization to sample light sensor
             case LDR_SAMPLING:
-                init_state(slaveBuffer, channel = CHANNEL_LDR,active_channels = 1);
+                init_state(channel = CHANNEL_LDR,active_channels = 1);
                 break;
                 
             //initialization to sample both sensors
             case BOTH_SAMPLING:
-                init_state(slaveBuffer, channel = CHANNEL_TMP,active_channels = 2);
+                init_state(channel = CHANNEL_TMP,active_channels = 2);
                 BLUE_LED_Write(BLUE_LED_ON);
                 break;
         }
@@ -95,7 +91,7 @@ void EZI2C_ISR_ExitCallback()
         by disabling the EZI2C peripheral if master requests to read
         data but the averaged sample is still not ready to be transmitted
     */
-    #if BCP_TRANSMISSION
+    #if BCP_TRANSMISSION_DEBUG
     char EZ_status = EZI2C_GetActivity();
 
     if (STATE>DEVICE_STOPPED)
@@ -113,10 +109,6 @@ void EZI2C_ISR_ExitCallback()
         }
     }
     #endif
-    
-    //char message[100];
-    //sprintf(message,"STATE:%d\nTimerPeriod:%d\nActualTimer:%d\nDivider:%d\n\n",STATE,timer_period,Timer_ReadPeriod(),Timer_CLK_GetDividerRegister());
-    //UART_PutString(message);
     
 }
 

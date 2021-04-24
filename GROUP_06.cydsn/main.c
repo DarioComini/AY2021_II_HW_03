@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include "math.h"
 
-#if BCP_TRANSMISSION
+#if BCP_TRANSMISSION_DEBUG
     uint8 transmission_ready = 0;
 #endif
 
@@ -52,14 +52,6 @@ int main(void)
     //Initialize timer to top-design period value (happens only once)
     Timer_Start();
     Timer_Stop();
-    
-    
-    
-    //UART_Start();
-    //CyDelay(100);
-    //UART_PutString("\fBegin");
-    
-    
     
     //initialize I2C slave component
     EZI2C_Start();
@@ -109,7 +101,7 @@ int main(void)
                 /*
                     Re-enable EZI2C interrupt if sample is ready
                 */
-                #if BCP_TRANSMISSION
+                #if BCP_TRANSMISSION_DEBUG
                     if (!transmission_ready)
                     {
                         transmission_ready = 1;

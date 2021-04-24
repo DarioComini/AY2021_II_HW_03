@@ -72,6 +72,6 @@ void startComponents(void);
 void stopComponents(void);
 char checkChanges(uint8_t *buffer);
 void resetBuffer(uint8_t *buffer);
-void init_state(uint8_t *buffer, char channel, char n_channel);
+void init_state(char channel, char n_channel);
 
 /* [] END OF FILE */

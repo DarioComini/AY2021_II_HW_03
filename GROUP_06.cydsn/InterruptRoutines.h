@@ -17,9 +17,9 @@
     /*
         Set this to 1 to force BCP communication to the desired frequency
     */
-    #define BCP_TRANSMISSION 1
+    #define BCP_TRANSMISSION_DEBUG 0
     
-    #if BCP_TRANSMISSION
+    #if BCP_TRANSMISSION_DEBUG
         extern uint8 transmission_ready;    
     #endif
     

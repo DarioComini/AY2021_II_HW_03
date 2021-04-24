@@ -81,18 +81,22 @@ char checkChanges(uint8_t *buffer)
 {  
     char onStatusChanged = 0;
     
+    /*
+        Read the parameters written in the slave buffer.
+    */
+    
     char new_timer = buffer[CTRL_REGISTER_2_BYTE];
     char new_average =  (buffer[CTRL_REGISTER_1_BYTE] & MASK_AVERAGE)>>INDEX_AVERAGE;
     char new_state = (buffer[CTRL_REGISTER_1_BYTE] & MASK_STATUS);
     
+    // if any parameter has changed, reset service variables
     if (new_timer != timer_period || new_average != samplesForAverage || new_state != STATE)
     {
         resetVariables();
     }
     
     /*
-        Read the timerperiod written in the slave buffer;
-        Check if it's greater than 2. If it's different from the previous timer period, update it
+        Check if timer_period is greater than 2. If it's different from the previous timer period, update it
     */
     if (new_timer != timer_period)
     {
@@ -108,8 +112,7 @@ char checkChanges(uint8_t *buffer)
     }
     
     /*
-        Read the average bits written in the slave buffer;
-        Check if it's not 0. If it's different from the previous average bits, update it
+        Check if new_average is not 0. If it's different from the previous average bits, update it
     */
     if (new_average != samplesForAverage)
     {
@@ -122,8 +125,7 @@ char checkChanges(uint8_t *buffer)
     }
     
     /*
-        Read the state bits written in the slave buffer;
-        If it's different from the previous state, update it
+        If new_state is different from the previous state, update it
     */
     if(new_state != STATE)
     {
@@ -166,7 +168,7 @@ void resetBuffer(uint8_t *buffer)
 * Return: void 
 *
 *******************************************************************************/
-void init_state(uint8_t *buffer, char channel, char n_channel)
+void init_state(char channel, char n_channel)
 {
     //Turn off the builtin LED
     BLUE_LED_Write(BLUE_LED_OFF);
