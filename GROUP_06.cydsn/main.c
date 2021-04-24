@@ -22,6 +22,7 @@ int32 value_digit = 0;
 uint8_t slaveBuffer[BUFFER_SIZE] = {0,0,WHO_AM_I_REG_VALUE,0,0,0,0};
 char channel = CHANNEL_TMP, active_channels = 0;
 
+uint8 transmission_ready = 0;
 
 int16 LDR_sample = 0, TMP_sample = 0;
 
@@ -32,6 +33,9 @@ int main(void)
     
     //enable timer interrupt
     ISR_Timer_StartEx(Custom_Timer_ISR);
+    divider = Timer_CLK_GetDividerRegister()+1;
+    samplesForAverage = 0;
+    timer_period = slaveBuffer[CTRL_REGISTER_2_BYTE];
     
     //initialize I2C slave component
     EZI2C_Start();
@@ -54,6 +58,7 @@ int main(void)
                     LDR_sample+=ADC_CountsTo_mVolts(value_digit);
                     break;
             }
+            
             if (ISR_tracker == samplesForAverage*active_channels)
             {
                 //perform average
@@ -73,11 +78,17 @@ int main(void)
                 slaveBuffer[LDR_Bit_15_8] = LDR_sample>>8;
                 slaveBuffer[LDR_Bit_07_0] = LDR_sample & 0xFF;
                 
-                //reset average, counter and sensor variables
+                //reset counter and sensor variables
                 TMP_sample = 0;
                 LDR_sample = 0;
                 ISR_tracker = 0;
-                slaveBuffer[CTRL_REGISTER_1_BYTE] &= 0b11;
+                
+                if (!transmission_ready)
+                {
+                    transmission_ready = 1;
+                    EZI2C_EnableInt();
+                }
+                
             }
             if (STATE == BOTH_SAMPLING)
             {
