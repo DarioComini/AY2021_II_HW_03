@@ -15,8 +15,9 @@
 #define BUFFER_SIZE 7
 #define RW_SIZE		2
 
-#define MASK_BIT_0  		(1<<CTRL_REG_Status_Bit_0)
-#define MASK_BIT_1  		(1<<CTRL_REG_Status_Bit_1)
+#define MASK_STATUS  		0b11
+#define MASK_AVERAGE 		0b111100
+#define INDEX_AVERAGE       2
 
 #define DEVICE_STOPPED  	0
 #define TMP_SAMPLING        1
@@ -31,12 +32,6 @@
 #define LDR_Bit_15_8		 5
 #define LDR_Bit_07_0		 6
 
-#define CTRL_REG_Status_Bit_0 			0
-#define CTRL_REG_Status_Bit_1 			1
-#define CTRL_REG_AverageSample_Bit_0 	2
-#define CTRL_REG_AverageSample_Bit_1 	3
-#define CTRL_REG_AverageSample_Bit_2 	4
-#define CTRL_REG_AverageSample_Bit_3 	5
 
 #define WHO_AM_I_REG_VALUE      0xBC
 
@@ -55,15 +50,16 @@
 #define TEN_TO_LDR_INTERCEPT        100000 //q = 5 -> pow(10,q) = 100000
 #define LDR_SLOPE                   -0.682
 
-char STATE, samplesForAverage;
+char STATE, samplesForAverage, timer_period;
 extern char ISR_tracker;
 extern int16 LDR_sample, TMP_sample;
+uint16 divider;
 
 //MACRO FOR FUNCTIONS
 void startComponents(void);
 void stopComponents(void);
-char checkStatus(uint8_t *buffer);
+char checkChanges(uint8_t *buffer);
 void resetBuffer(uint8_t *buffer, int length);
-void init_state(uint8_t *buffer, char channel);
+void init_state(uint8_t *buffer, char channel, char n_channel);
 
 /* [] END OF FILE */

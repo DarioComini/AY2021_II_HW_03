@@ -33,15 +33,33 @@ void stopComponents()
     BLUE_LED_Write(BLUE_LED_OFF);
 }
 
-char checkStatus(uint8_t *buffer)
+char checkChanges(uint8_t *buffer)
 {
     char onStatusChanged = 0;
-    char new_state = (buffer[CTRL_REGISTER_1_BYTE] & MASK_BIT_0) + (buffer[CTRL_REGISTER_1_BYTE] & MASK_BIT_1);
-    if(new_state != STATE)
+    char new_state = (buffer[CTRL_REGISTER_1_BYTE] & MASK_STATUS);
+    char new_timer = buffer[CTRL_REGISTER_2_BYTE]; 
+    if(new_timer < 2)
+    {
+        new_timer = 2;
+        buffer[CTRL_REGISTER_2_BYTE] = 2;
+    }
+    
+    
+    char new_average =  (buffer[CTRL_REGISTER_1_BYTE] & MASK_AVERAGE)>>INDEX_AVERAGE;
+    if(new_average == 0)
+    {
+        new_average = 1;
+        buffer[CTRL_REGISTER_1_BYTE] |= 1<<INDEX_AVERAGE;
+    }
+    
+    if(new_state != STATE || new_timer != timer_period || new_average != samplesForAverage)
     {
         onStatusChanged = 1;
-        STATE = new_state;
         resetVariables();
+        //assign changes
+        STATE = new_state;
+        samplesForAverage = new_average;
+        timer_period = new_timer;
     }
     return onStatusChanged;
 }
@@ -55,14 +73,13 @@ void resetBuffer(uint8_t *buffer, int length)
     buffer[WHO_AM_I] = WHO_AM_I_REG_VALUE;
 }
 
-void init_state(uint8_t *buffer, char channel)
+void init_state(uint8_t *buffer, char channel, char n_channel)
 {
     BLUE_LED_Write(BLUE_LED_OFF);
-    if(buffer[CTRL_REGISTER_2_BYTE] > 0)                Timer_WritePeriod(buffer[CTRL_REGISTER_2_BYTE]); 
-    else                                                Timer_WritePeriod(DEFAULT_CHANNEL_PERIOD);
+    Timer_WritePeriod(buffer[CTRL_REGISTER_2_BYTE]);
+    Timer_CLK_SetDivider(divider/(n_channel)-1);
     
     MUX_Select(channel);
-    
     startComponents();
 }
 

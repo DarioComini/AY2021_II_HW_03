@@ -33,6 +33,9 @@ int main(void)
     
     //enable timer interrupt
     ISR_Timer_StartEx(Custom_Timer_ISR);
+    divider = Timer_CLK_GetDividerRegister()+1;
+    samplesForAverage = 0;
+    timer_period = slaveBuffer[CTRL_REGISTER_2_BYTE];
     
     //initialize I2C slave component
     EZI2C_Start();

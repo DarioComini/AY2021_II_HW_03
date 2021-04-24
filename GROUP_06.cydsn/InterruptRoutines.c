@@ -11,6 +11,8 @@
 */
 #include "InterruptRoutines.h" 
 
+#define DEBUG_CODE 1
+
 extern char sample_ready, ISR_tracker;
 
 extern int16 LDR_sample, TMP_sample;
@@ -40,7 +42,7 @@ void EZI2C_ISR_ExitCallback()
 {
     
     //if status changed
-    if(checkStatus(slaveBuffer))
+    if(checkChanges(slaveBuffer))
     {   
         switch(STATE)
         {
@@ -49,29 +51,19 @@ void EZI2C_ISR_ExitCallback()
                 resetBuffer(slaveBuffer,BUFFER_SIZE);
                 break;
             case TMP_SAMPLING:
-                active_channels = 1;
-                init_state(slaveBuffer, channel = CHANNEL_TMP);
+                init_state(slaveBuffer, channel = CHANNEL_TMP,active_channels = 1);
                 break;
             case LDR_SAMPLING:
-                active_channels = 1;
-                init_state(slaveBuffer, channel = CHANNEL_LDR);
+                init_state(slaveBuffer, channel = CHANNEL_LDR,active_channels = 1);
                 break;
             case BOTH_SAMPLING:
-                init_state(slaveBuffer, channel = CHANNEL_TMP);
+                init_state(slaveBuffer, channel = CHANNEL_TMP,active_channels = 2);
                 BLUE_LED_Write(BLUE_LED_ON);
-                active_channels = 2;
                 break;
             
         }
     }
-    
-    //check if average is changed
-    if((slaveBuffer[CTRL_REGISTER_1_BYTE]>>2 & 0x0F) > 0)    
-        samplesForAverage = (slaveBuffer[CTRL_REGISTER_1_BYTE]>>2 & 0x0F);
-    else
-        samplesForAverage = 1;
-    
-    
+    #if DEBUG_CODE
     
     char EZ_status = EZI2C_GetActivity();
 
@@ -89,6 +81,7 @@ void EZI2C_ISR_ExitCallback()
             transmission_ready = 0;
         }
     }
+    #endif
     
 }
 
