@@ -1,3 +1,16 @@
+;To set the correct transmission rate, the user must select both the number of samples for average and the timer period according 
+; to these parameters and formulas:
+; - basic_clock_freq = 6250 Hz
+; - max timer_period = 0xFF (255)
+; - number_of_samples = number of samples on which we perform the average before to update the data on each single channel
+
+; transmission rate = (basic_clock_freq * number_channels)/(timer_period * number_of_samples * number_channels)
+
+; (NOTE: because of registers resolution, the range of frequencies we are able to cover with an acceptable degree of accuracy for all range of
+; number_of_samples (1-15) is in the interval [25-75] Hz)
+ 
+
+
 ; Enter DEVICE_STOPPED state (Write status to be 0b00)
 w 08 00 00 p
 
@@ -6,7 +19,7 @@ w 08 02 p r 08 x p
 
 ; Sample TEMPERATURE[hundredths of Celsius]
 
-w 08 01 C8 p    ;run this to set the timer period to 200   
+w 08 01 19 p    ;run this to set the timer period to 25   
 w 08 00 15 p    ;run this to set the status to 0b01 and to set the number of samples for average to 5
 ;NOTE: the number of samples for average and the value of timer period are set to fullfill the 50 Hz transmission. 
 ;Any different value will compromise this transmission rate
@@ -15,7 +28,7 @@ w 08 03 p r 08 @1temp_centiCelsius @0temp_centiCelsius p  ; repeat this line to 
 
 ; Sample LIGHT[LUX] 
 
-w 08 01 02 p    ;run this to set the timer period to 200   
+w 08 01 19 p    ;run this to set the timer period to 25   
 w 08 00 16 p    ;run this to set the status to 0b10 and to set the number of samples for average to 5
 ;NOTE: the number of samples for average and the value of timer period are set to fullfill the 50 Hz transmission. 
 ;Any different value will compromise this transmission rate
@@ -25,7 +38,9 @@ w 08 05 p r 08 @1light_LUX @0light_LUX p  ; repeat this line to plot data (in LU
 
 ; Sample TEMPERATURE[hundredths of Celsius] & LIGHT[LUX] (BOTH_CHANNELS)
 
-w 08 01 64 p    ;run this to set the timer period to 100   
+w 08 01 19 p    ;run this to set the timer period to 25. 
+;(NOTE: this is equal to the single channel period because the program handles the doubling of the timer_clock frequency by its own. 
+;This guarantees better precision with either one channel or two channels)   
 w 08 00 17 p    ;run this to set the status to 0b11 and to set the number of samples for average to 5 for each channel 
 ;NOTE: the number of samples for average and the value of timer period are set to fullfill the 50 Hz transmission. 
 ;Any different value will compromise this transmission rate
