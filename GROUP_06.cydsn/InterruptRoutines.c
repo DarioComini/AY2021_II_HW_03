@@ -1,28 +1,35 @@
 /* ========================================
  *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
+ * Authors: Michele Pezzi, Dario Comini
+ * Date: 27/04/2021
+ * 
+ * Source file for interrupt routines
  *
  * ========================================
 */
 #include "InterruptRoutines.h" 
 
-#define DEBUG_CODE 1
 
-extern char sample_ready, ISR_tracker;
 
-extern int16 LDR_sample, TMP_sample;
-extern int32 value_digit;
 
-extern uint8_t slaveBuffer[BUFFER_SIZE];
-extern char channel, active_channels;
+//#include "stdio.h"
 
-extern uint8 transmission_ready;
 
+
+
+
+/*******************************************************************************
+* Function Name: Custom_Timer_ISR
+********************************************************************************
+*
+* Summary: Samples Delta-sigma ADC and tells main that sample is ready to be
+           processed
+*  
+* Parameters: void
+*  
+* Return: void 
+*
+*******************************************************************************/
 CY_ISR(Custom_Timer_ISR)
 {
     Timer_ReadStatusRegister();
@@ -38,33 +45,57 @@ CY_ISR(Custom_Timer_ISR)
 
 }
 
+
+/*******************************************************************************
+* Function Name: Custom_Timer_ISR
+********************************************************************************
+*
+* Summary: Checks if a change occurred in slave buffer control registers. If so,
+*          Initialize the peripherals and variables according to the state.
+*  
+* Parameters: void
+*  
+* Return: void 
+*
+*******************************************************************************/
 void EZI2C_ISR_ExitCallback()
 {
     
-    //if status changed
-    if(checkChanges(slaveBuffer))
-    {   
+    //if a change occurred in a control register
+    if (checkChanges(slaveBuffer))
+    {
         switch(STATE)
         {
-            case DEVICE_STOPPED: //completed
+            // state 0 (device stopped)
+            case DEVICE_STOPPED:
                 stopComponents();
-                resetBuffer(slaveBuffer,BUFFER_SIZE);
+                resetBuffer(slaveBuffer);
                 break;
+                
+            //initialization to sample temperature sensor
             case TMP_SAMPLING:
                 init_state(slaveBuffer, channel = CHANNEL_TMP,active_channels = 1);
                 break;
+            
+            //initialization to sample light sensor
             case LDR_SAMPLING:
                 init_state(slaveBuffer, channel = CHANNEL_LDR,active_channels = 1);
                 break;
+                
+            //initialization to sample both sensors
             case BOTH_SAMPLING:
                 init_state(slaveBuffer, channel = CHANNEL_TMP,active_channels = 2);
                 BLUE_LED_Write(BLUE_LED_ON);
                 break;
-            
         }
     }
-    #if DEBUG_CODE
     
+    /*
+        force BCP communication to the desired frequency 
+        by disabling the EZI2C peripheral if master requests to read
+        data but the averaged sample is still not ready to be transmitted
+    */
+    #if BCP_TRANSMISSION
     char EZ_status = EZI2C_GetActivity();
 
     if (STATE>DEVICE_STOPPED)
@@ -82,6 +113,10 @@ void EZI2C_ISR_ExitCallback()
         }
     }
     #endif
+    
+    //char message[100];
+    //sprintf(message,"STATE:%d\nTimerPeriod:%d\nActualTimer:%d\nDivider:%d\n\n",STATE,timer_period,Timer_ReadPeriod(),Timer_CLK_GetDividerRegister());
+    //UART_PutString(message);
     
 }
 

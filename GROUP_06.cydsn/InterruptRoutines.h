@@ -1,11 +1,9 @@
 /* ========================================
  *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
+ * Authors: Michele Pezzi, Dario Comini
+ * Date: 27/04/2021
+ * 
+ * Header file for interrupt routines
  *
  * ========================================
 */
@@ -16,10 +14,20 @@
     #include "project.h"
     #include "ProjectUtils.h"
     
+    /*
+        Set this to 1 to force BCP communication to the desired frequency
+    */
+    #define BCP_TRANSMISSION 1
+    
+    #if BCP_TRANSMISSION
+        extern uint8 transmission_ready;    
+    #endif
+    
+    extern int32 value_digit;
+    extern char sample_ready;
+    
     CY_ISR_PROTO(Custom_Timer_ISR);
     
-    void sampleSingleChannel(char channel,int16* LDR_sample,int16* TMP_sample, char avg_count);
-
 #endif
 
 /* [] END OF FILE */
