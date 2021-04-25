@@ -40,7 +40,7 @@ CY_ISR(Custom_Timer_ISR)
 
 
 /*******************************************************************************
-* Function Name: Custom_Timer_ISR
+* Function Name: EZI2C_ISR_ExitCallback
 ********************************************************************************
 *
 * Summary: Checks if a change occurred in slave buffer control registers. If so,
@@ -54,7 +54,7 @@ CY_ISR(Custom_Timer_ISR)
 void EZI2C_ISR_ExitCallback()
 {
     
-    //if a change occurred in a control register
+    //if a change occurred in a control register (in particular if state changed)
     if (checkChanges(slaveBuffer))
     {
         switch(STATE)
