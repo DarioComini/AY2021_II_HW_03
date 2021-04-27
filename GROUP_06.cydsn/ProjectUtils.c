@@ -43,7 +43,8 @@ void startComponents()
 {
     Timer_Start();
     ADC_Start();
-    ADC_SetGain(14094);//((65535/ACTUAL_Vdd_mV)*1000 + 1);
+    int32 gain = (65535/ACTUAL_Vdd_mV)*1000 + 1;
+    ADC_SetGain(gain);
 }
 
 /*******************************************************************************
@@ -51,7 +52,7 @@ void startComponents()
 ********************************************************************************
 *
 * Summary: Stops project peripherals (Timer, ADC)
-           Switches of builtin LED
+           Switches off builtin LED
 *  
 * Parameters: void
 *  
